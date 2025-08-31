@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aleks — DevOps / Cloud / AI Infra</title>
+  <meta name="description" content="Aleks — DevOps Team Lead @ Gcore Cloud. Infra that doesn't cry: Kubernetes, RDMA/IB, H100, Crossplane, vLLM, Observability." />
+  <meta name="theme-color" content="#0b0f1a" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.png" type="image/png" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Aleks — DevOps / Cloud / AI Infra" />
+  <meta property="og:description" content="Infra that doesn't cry: Kubernetes, RDMA, H100, Crossplane, vLLM, Observability." />
+  <meta property="og:image" content="https://apten-fors.github.io/preview.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://apten-fors.github.io/preview.png" />
+
+  <style>
+    :root{
+      --bg-0:#06070b; --bg-1:#0b1020; --bg-2:#0e1326;
+      --txt:#e7e8f1; --muted:#a2acc2;
+      --acc1:#8b5cf6; --acc2:#06b6d4; --acc3:#22d3ee;
+      --glass:rgba(255,255,255,0.06);
+      --border:rgba(255,255,255,0.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px var(--border);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "SF Pro Display", Arial;
+      color:var(--txt); background: radial-gradient(1200px 600px at 10% 0%, #0b122a 0%, #070912 50%, #05060a 100%), #000;
+      overflow-x:hidden; letter-spacing:.2px;
+    }
+    .grid{
+      position:fixed; inset:0; pointer-events:none; z-index:-1;
+      background-image:
+        radial-gradient(1000px 600px at 80% -10%, rgba(139,92,246,.20), transparent 60%),
+        radial-gradient(800px 400px at 20% 110%, rgba(6,182,212,.18), transparent 60%),
+        linear-gradient(to bottom, rgba(255,255,255,.05), rgba(255,255,255,0) 15%);
+    }
+    .grid::before{
+      content:""; position:absolute; inset:0;
+      background-image: linear-gradient(transparent 95%, rgba(255,255,255,.05) 96%), linear-gradient(90deg, transparent 95%, rgba(255,255,255,.05) 96%);
+      background-size: 50px 50px; opacity:.08; mix-blend-mode:screen;
+    }
+    canvas#bg{ position:fixed; inset:0; z-index:-2; filter: saturate(1.2) blur(.2px); opacity:.9}
+    .wrap{width:min(1100px, 92vw); margin:0 auto; padding: clamp(20px, 4vw, 40px);}
+    header{display:flex; flex-direction:column; align-items:start; gap:20px; padding-top: min(9vh, 80px);}
+    .badge-bar{display:flex; flex-wrap:wrap; gap:10px}
+    .badge{padding:8px 12px; border-radius:999px; background:linear-gradient(135deg, rgba(139,92,246,.18), rgba(6,182,212,.12)); border:1px solid var(--border); backdrop-filter: blur(6px); font-size:14px; color:var(--txt)}
+    .title{
+      font-size:clamp(44px, 9vw, 92px); line-height:1.02; margin:0; font-weight:800; letter-spacing:-1.5px;
+      text-shadow: 0 0 20px rgba(139,92,246,.35), 0 0 40px rgba(6,182,212,.25);
+    }
+    .title .accent{background: linear-gradient(90deg, var(--acc1), var(--acc2), var(--acc3)); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .glitch{ position:relative; display:inline-block }
+    .glitch::before, .glitch::after{
+      content:attr(data-text); position:absolute; left:0; top:0; width:100%; height:100%;
+      pointer-events:none; mix-blend-mode:screen; opacity:.8
+    }
+    .glitch::before{ color:#8b5cf6; transform: translate3d(-1px,0,0); animation:gl1 4s infinite both ease-in-out}
+    .glitch::after{ color:#06b6d4; transform: translate3d(1px,0,0); animation:gl2 4s infinite both ease-in-out}
+    @keyframes gl1{ 0%,100%{transform:translate(0)} 5%{transform:translate(-2px,1px)} 10%{transform:translate(1px,-1px)} 15%{transform:translate(-1px,2px)} 20%{transform:translate(0)} }
+    @keyframes gl2{ 0%,100%{transform:translate(0)} 5%{transform:translate(2px,-1px)} 10%{transform:translate(-1px,1px)} 15%{transform:translate(1px,-2px)} 20%{transform:translate(0)} }
+    .subtitle{max-width:900px; font-size: clamp(16px, 2.2vw, 22px); color:var(--muted)}
+    .cta{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{--h:52px; display:inline-flex; align-items:center; gap:10px; height:var(--h); padding:0 18px; border-radius:12px; border:1px solid var(--border); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--txt); text-decoration:none; font-weight:600; letter-spacing:.3px; box-shadow: var(--shadow); transition:.2s transform, .2s filter, .2s box-shadow}
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); box-shadow: 0 12px 30px rgba(139,92,246,.15)}
+    .btn.primary{ background: linear-gradient(90deg, rgba(139,92,246,.9), rgba(6,182,212,.9)); border-color: transparent; color:#0a0d14}
+    .btn.ghost{ background: transparent}
+    .btn small{opacity:.8; font-weight:500}
+    section{margin-top: clamp(30px, 6vw, 60px);}
+    .cards{display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-top:16px}
+    .card{ position:relative; padding:18px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border:1px solid var(--border); box-shadow: var(--shadow) }
+    .card h3{margin:8px 0 8px; font-size:20px}
+    .card p{margin:0; color:var(--muted)}
+    .card .big{ font-size:28px; font-weight:800; letter-spacing:-.5px}
+    .kudos{display:flex; gap:12px; flex-wrap:wrap;}
+    .kudos .chip{padding:8px 12px; border-radius:12px; background:var(--glass); border:1px solid var(--border); color:var(--muted); font-size:14px}
+    .terminal{background: #0a0e19; border:1px solid var(--border); border-radius:16px; padding:16px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow:hidden; box-shadow: var(--shadow)}
+    .terminal .head{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+    .dot{width:10px; height:10px; border-radius:50%;}
+    .dot.red{background:#ff5f56}.dot.yellow{background:#ffbd2e}.dot.green{background:#27c93f}
+    .term-body{min-height:130px; white-space:pre-wrap; color:#e2eafc}
+    .caret{display:inline-block; width:.6ch; background:#e2eafc; animation:blink 1s step-end infinite}
+    @keyframes blink{50%{opacity:0}}
+    footer{margin:60px 0 40px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+    .right{display:flex; gap:10px; align-items:center}
+    @media (max-width:680px){ .title{letter-spacing:-.8px} }
+    .toast{
+      position: fixed; left: 50%; top: 18px; transform: translateX(-50%); padding: 12px 16px;
+      border:1px solid var(--border); border-radius: 12px; background: rgba(14,19,38,.9); color: var(--txt);
+      box-shadow: var(--shadow); display: none; z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="grid"></div>
+  <div class="wrap">
+    <header>
+      <div class="badge-bar">
+        <span class="badge">🚀 DevOps / Cloud / AI Infra</span>
+        <span class="badge">🧠 Team Lead @ Gcore Cloud</span>
+        <span class="badge">📍 Nicosia, Cyprus</span>
+      </div>
+      <h1 class="title glitch" data-text="Aleks"><span class="accent">Aleks</span></h1>
+      <p class="subtitle">Infra that doesn't cry: Kubernetes, RDMA/InfiniBand, H100, Crossplane, Grafana, vLLM, GPU-aware scheduling. In love with simple architectures and strict SLOs.</p>
+      <div class="cta">
+        <a class="btn primary" href="mailto:aleks@example.com">Email&nbsp;me&nbsp;↗</a>
+        <button class="btn ghost" id="copyHandle" title="Copy @apten_fors">@apten_fors&nbsp;<small>(Telegram)</small></button>
+        <a class="btn ghost" href="#" id="gh">GitHub</a>
+        <a class="btn ghost" href="#" id="li">LinkedIn</a>
+        <button class="btn" id="theme">🌗 Theme</button>
+      </div>
+    </header>
+
+    <section>
+      <div class="cards">
+        <div class="card">
+          <h3>⚙️ What I do</h3>
+          <p>I build and tame cloud infrastructure. K8s, networking, storage, observability, pipelines. I make it <em>fast</em> and <em>painless</em> for engineers.</p>
+        </div>
+        <div class="card">
+          <h3>🧩 What I tinker with</h3>
+          <p>AI infra: training/inference, LoRA/SFT, vector DBs, vLLM. I love optimizing the GPU stack, NUMA, RDMA.</p>
+        </div>
+        <div class="card">
+          <h3>📈 KPI, but humane</h3>
+          <div class="kudos">
+            <span class="chip">99.95% SLO</span>
+            <span class="chip">TTR ↓ x2</span>
+            <span class="chip">Cost ↓ 20–40%</span>
+            <span class="chip">Deploys ↑ daily</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="cards">
+        <div class="card">
+          <div class="big">Infra without tears</div>
+          <p>Clean interfaces. Predictable releases. Sensible alerts. Documentation people actually read.</p>
+        </div>
+        <div class="card">
+          <h3>🛠 Technologies</h3>
+          <p>Kubernetes, Cilium, Helm, Crossplane, Terraform, ArgoCD, Prometheus/Grafana/VictoriaMetrics, Nix, GitHub/GitLab CI, KubeVirt, SR-IOV, IB/RDMA, NV GPU (H100), MLflow, vLLM.</p>
+        </div>
+        <div class="card">
+          <h3>💬 Talks / threads</h3>
+          <p>About Kubernetes networking, admission policies, observability, AI infra. <a href="#" id="talks">Links later →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects / Threads -->
+    <section>
+      <h2 style="font-size:28px; margin-bottom:16px;">🚧 Projects / Threads</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>🔥 AptenBot</h3>
+          <p>Telegram proxy-bot for LLM providers. Minimal, stylish, vibey.</p>
+          <a class="btn ghost" href="https://t.me/aptenbot" target="_blank" rel="noopener">Try</a>
+        </div>
+        <div class="card">
+          <h3>📊 Preheat Controller</h3>
+          <p>TODO: K8s controller to pre-warm images. Less pain during deploys.</p>
+          <a class="btn ghost" href="https://github.com/apten-fors" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="card">
+          <h3>🧵 Threads</h3>
+          <p>A collection of posts about K8s, Observability, and AI infra.</p>
+          <a class="btn ghost" href="https://t.me/korobo4ka_xoroni" target="_blank" rel="noopener">Twitter/X</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="terminal" aria-label="Fancy terminal">
+        <div class="head">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        </div>
+        <div class="term-body" id="terminal"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> Aleks. Made with 🖤 and <span title="Sane defaults">sane defaults</span>.</div>
+      <div class="right"><span style="opacity:.7">Try:</span><code style="background:var(--glass); padding:6px 10px; border-radius:10px; border:1px solid var(--border)">↑ ↑ ↓ ↓ ← → ← → B A</code></div>
+    </footer>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+
+    const PROFILE = {
+      email: "zhivoysp@gmail.com",
+      telegram: "@apten_fors",
+      github: "https://github.com/apten-fors",
+      linkedin: "https://linkedin.com/in/aleksandr-zhitnikov"
+    };
+
+    const toast = (msg)=>{
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window.__toast); window.__toast = setTimeout(()=> t.style.display='none', 2200);
+    };
+
+    // links + copy handle
+    document.getElementById('gh').href = PROFILE.github;
+    document.getElementById('li').href = PROFILE.linkedin;
+    document.querySelector('.cta a[href^="mailto:"]').href = `mailto:${PROFILE.email}`;
+    document.getElementById('copyHandle').addEventListener('click', async ()=>{
+      await navigator.clipboard.writeText(PROFILE.telegram);
+      toast('Copied to clipboard');
+    });
+
+    // theme toggle
+    const themeBtn = document.getElementById('theme');
+    const key = 'theme-dark';
+    const applyTheme = () => {
+      const dark = localStorage.getItem(key) !== 'false';
+      document.documentElement.style.setProperty('color-scheme', dark ? 'dark' : 'light');
+      themeBtn.textContent = dark ? '🌗 Theme' : '🌞 Theme';
+      if(!dark){
+        document.documentElement.style.setProperty('--bg-0', '#f6f7fb');
+        document.documentElement.style.setProperty('--bg-1', '#eef1f9');
+        document.documentElement.style.setProperty('--bg-2', '#e9ecf7');
+        document.documentElement.style.setProperty('--txt', '#0b1020');
+        document.documentElement.style.setProperty('--muted', '#51607a');
+        document.body.style.background = 'linear-gradient(180deg, #f8faff, #e7ecfb)';
+      } else {
+        document.documentElement.style.setProperty('--bg-0', '#06070b');
+        document.documentElement.style.setProperty('--bg-1', '#0b1020');
+        document.documentElement.style.setProperty('--bg-2', '#0e1326');
+        document.documentElement.style.setProperty('--txt', '#e7e8f1');
+        document.documentElement.style.setProperty('--muted', '#a2acc2');
+        document.body.style.background = 'radial-gradient(1200px 600px at 10% 0%, #0b122a 0%, #070912 50%, #05060a 100%), #000';
+      }
+    };
+    themeBtn.addEventListener('click', ()=>{ localStorage.setItem(key, !(localStorage.getItem(key) !== 'false')); applyTheme(); });
+    applyTheme();
+
+    // year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Fancy terminal typing
+    const lines = [
+      "➜  ~ whoami",
+      "aleks",
+      "",
+      "➜  ~ kubectl get nodes -o wide",
+      "NAME            STATUS   ROLES           VERSION   GPU   RDMA   ZONE",
+      "worker-a100     Ready    <none>          v1.30    ✅     ✅    eu-cy-nic",
+      "worker-h100     Ready    <none>          v1.30    ✅     ✅    eu-cy-nic",
+      "",
+      "➜  ~ cat mission.txt",
+      "Build infra that doesn't cry. Ship daily. Keep bills sane.",
+      "",
+      "➜  ~ curl -sL https://infra.run | sh",
+      "Installing sanity… done.",
+    ];
+    const term = document.getElementById('terminal');
+    const type = async (text, delay=8) => {
+      for (let ch of text){
+        term.append(ch); await new Promise(r=>setTimeout(r, delay));
+      }
+      term.append(document.createElement('br'));
+    };
+    (async ()=>{
+      for (const l of lines){
+        await type(l, Math.random()*3+6);
+        await new Promise(r=>setTimeout(r, 140));
+      }
+      const caret = document.createElement('span'); caret.className='caret'; term.append(caret);
+    })();
+
+    // Konami code → Party mode
+    (function(){
+      const seq = [38,38,40,40,37,39,37,39,66,65];
+      let buf = [];
+      window.addEventListener('keydown', e=>{
+        buf.push(e.keyCode); if(buf.length>seq.length) buf.shift();
+        if(seq.every((v,i)=>v===buf[i])){
+          document.body.style.animation = 'pulse 3s infinite';
+          toast('Party mode: ON 🎉');
+        }
+      });
+      const style = document.createElement('style');
+      style.textContent = `@keyframes pulse{0%{filter:hue-rotate(0)}50%{filter:hue-rotate(40deg) saturate(1.2)}100%{filter:hue-rotate(0)}}`;
+      document.head.appendChild(style);
+    })();
+
+    // Background particles (no libs)
+    (function(){
+      const c = document.getElementById('bg');
+      const ctx = c.getContext('2d');
+      let w, h, dpr;
+      const R = ()=>{
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = c.width = innerWidth * dpr; h = c.height = innerHeight * dpr;
+        c.style.width = innerWidth + 'px'; c.style.height = innerHeight + 'px';
+      };
+      window.addEventListener('resize', R); R();
+
+      const N = 80;
+      const pts = Array.from({length:N}, ()=> ({
+        x: Math.random()*w, y: Math.random()*h,
+        vx: (Math.random()-.5)*.35*dpr, vy: (Math.random()-.5)*.35*dpr
+      }));
+      function step(){
+        ctx.clearRect(0,0,w,h);
+        const g = ctx.createLinearGradient(0,0,w,h);
+        g.addColorStop(0,'rgba(139,92,246,.15)'); g.addColorStop(1,'rgba(6,182,212,.1)');
+        ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+
+        for (let i=0;i<N;i++){
+          const p = pts[i];
+          p.x += p.vx; p.y += p.vy;
+          if(p.x<0||p.x>w) p.vx*=-1;
+          if(p.y<0||p.y>h) p.vy*=-1;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 1.6*dpr, 0, Math.PI*2); ctx.fillStyle='rgba(255,255,255,.65)'; ctx.fill();
+        }
+        ctx.lineWidth = .6*dpr;
+        for (let i=0;i<N;i++){
+          for (let j=i+1;j<N;j++){
+            const a = pts[i], b = pts[j];
+            const dx = a.x-b.x, dy = a.y-b.y; const dist = Math.hypot(dx,dy);
+            if(dist < 140*dpr){
+              const o = 1 - dist/(140*dpr);
+              ctx.strokeStyle = `rgba(173,216,255,${o*.25})`;
+              ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(step);
+      }
+      step();
+    })();
+  </script>
+</body>
+</html>
